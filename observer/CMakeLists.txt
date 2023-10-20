@@ -6,6 +6,7 @@ project(observer)
 # NORDIC SDK APP START
 target_sources(app PRIVATE
     src/main.c
+    src/observer.c
 )
 
 # NORDIC SDK APP END
