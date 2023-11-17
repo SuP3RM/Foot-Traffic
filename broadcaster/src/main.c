@@ -13,11 +13,12 @@ static uint8_t mfg_data[] = {0xff, 0xff, 0x00};
 
 static const struct bt_data ad[] = {
     BT_DATA(BT_DATA_MANUFACTURER_DATA, mfg_data, 3),
-    BT_DATA(BT_DATA_NAME_COMPLETE, BROADCASTER_IRK, sizeof(BROADCASTER_IRK) - 1) // -1 to exclude null terminator
+    BT_DATA(BT_DATA_NAME_COMPLETE, BROADCASTER_IRK,
+            sizeof(BROADCASTER_IRK) - 1) // -1 to exclude null terminator
 };
 
 int main(void) {
-  int err;  
+  int err;
 
   printk("Starting Broadcaster\n");
 
@@ -41,7 +42,7 @@ int main(void) {
   }
 
   do {
-    k_msleep(1000);
+    k_msleep(10); // Sleep for 100 milliseconds 
 
     printk("Sending advertising data: 0x%02X\n", mfg_data[2]);
 
@@ -49,15 +50,15 @@ int main(void) {
     err =
         bt_le_adv_start(BT_LE_ADV_NCONN_IDENTITY, ad, ARRAY_SIZE(ad), NULL, 0);
     if (err) {
-      printk("Advertising failed to start (err %d)\n", err);
+      printk("Broadcaster advertising failed to start (err %d)\n", err);
       return 0;
     }
 
-    k_msleep(1000);
+    k_msleep(10); // Sleep for 100 milliseconds 
 
     err = bt_le_adv_stop();
     if (err) {
-      printk("Advertising failed to stop (err %d)\n", err);
+      printk("Broadcaster advertising failed to stop (err %d)\n", err);
       return 0;
     }
 
