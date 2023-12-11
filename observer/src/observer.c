@@ -1,3 +1,4 @@
+#include <stdint.h>
 #include <zephyr/sys/printk.h>
 #include <zephyr/bluetooth/bluetooth.h>
 #include <zephyr/bluetooth/hci.h>
@@ -8,6 +9,10 @@
 
 #define NAME_LEN 30
 
+// Global counter variable
+static int counter = 0;
+
+// Callback for when a device is found
 static void device_found(const bt_addr_le_t *addr, int8_t rssi, uint8_t type, struct net_buf_simple *ad)
 {
     char addr_str[BT_ADDR_LE_STR_LEN];
@@ -35,13 +40,28 @@ static void device_found(const bt_addr_le_t *addr, int8_t rssi, uint8_t type, st
         return;
     }
 
-    // If we reach here, it means the PSK matched. Continue processing as required.
-    printk("Broadcaster with matching ISK found: %s (RSSI %d)\n", addr_str, rssi);
+
+    // If the PSK matched, print the RSSI value
+    // printk("%d\n", rssi);
+    // print RSSI value when threshold is reached (ex: -60) - AKA a person walked through
+    const int8_t avg_mean = -50.;
+    const int8_t std_dev = 4.;
+    const int8_t threshold = avg_mean - (std_dev * 1.5);
+    
+    if (rssi < threshold) {
+        printk("Person walked through! %d\n", rssi);
+        // Increment the counter
+        counter++;
+        // Print the counter value
+        printk("Counter: %d\n", counter);
+        // delay for 1 second
+        k_sleep(K_SECONDS(1));
+    }
 }
 
 
 
-int observer_start(void)
+int observer_start(int i)
 {
 	struct bt_le_scan_param scan_param = {
 		.type       = BT_LE_SCAN_TYPE_PASSIVE,
@@ -51,12 +71,17 @@ int observer_start(void)
 	};
 	int err;
 
-	err = bt_le_scan_start(&scan_param, device_found);
+    // Start scanning
+    err = bt_le_scan_start(&scan_param, device_found);
+    
 	if (err) {
 		printk("Start scanning failed (err %d)\n", err);
-		return err;
 	}
 	printk("Started scanning...\n");
 
-	return 0;
+    // Sleep for 10 seconds
+    // k_sleep(K_SECONDS(10));
+
+    // Stop scanning
+    // err = bt_le_scan_stop();
 }
