@@ -11,6 +11,11 @@
 
 // Global counter variable
 static int counter = 0;
+// Global mean RSSI values and standard deviation 
+// Depending on the distance and different enviorment, these values should be adjusted after test
+static int8_t avg_mean = -50.;
+static int8_t std_dev = 4.;
+
 
 // Callback for when a device is found
 static void device_found(const bt_addr_le_t *addr, int8_t rssi, uint8_t type, struct net_buf_simple *ad)
@@ -43,11 +48,11 @@ static void device_found(const bt_addr_le_t *addr, int8_t rssi, uint8_t type, st
 
     // If the PSK matched, print the RSSI value
     // printk("%d\n", rssi);
-    // print RSSI value when threshold is reached (ex: -60) - AKA a person walked through
-    const int8_t avg_mean = -50.;
-    const int8_t std_dev = 4.;
+    // Cauculate threshold & update the mean RSSI and standard deviation
     const int8_t threshold = avg_mean - (std_dev * 1.5);
-    
+    avg_mean += (rssi - avg_mean) / (500 + 1);
+    std_dev = sqrt((std_dev * std_dev) + ((rssi - avg_mean) * (rssi - avg_mean)) / (500 + 1));
+    // print RSSI value when threshold is reached (ex: -60) - AKA a person walked through
     if (rssi < threshold) {
         printk("Person walked through! %d\n", rssi);
         // Increment the counter
