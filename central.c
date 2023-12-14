@@ -1,6 +1,9 @@
 #include <bluefruit.h>
 // Threshold for significant RSSI change
-const int RSSI_FLUCTUATION_THRESHOLD = -70; // Adjust based on your environment
+const int avg_mean = -50; // Adjust based on your environment
+const int std_dev = 4;
+const threshold = avg_mean - (std_dev * 2);
+static count = 0
 int lastRssi = 0;
 unsigned long lastDetectionTime = 0;
 const unsigned long detectionInterval = 2000; // 2 seconds to avoid multiple counts for same event
@@ -8,15 +11,17 @@ void scan_callback(ble_gap_evt_adv_report_t* report) {
   int rssi = report->rssi;
   unsigned long currentTime = millis();
   // Detect significant RSSI fluctuation
-  if (lastRssi != 0 && abs(lastRssi - rssi) >= RSSI_FLUCTUATION_THRESHOLD) {
+  if (lastRssi != 0 && abs(lastRssi - rssi) >= threshold) {
     if (currentTime - lastDetectionTime > detectionInterval) {
+      count++;
       Serial.println("Foot traffic detected");
+      Serial.println(count);
       lastDetectionTime = currentTime;
     }
   }
   lastRssi = rssi;
-  Serial.print("Detected BLE Device, RSSI: ");
-  Serial.println(rssi);
+  //Serial.print("Detected BLE Device, RSSI: ");
+  //Serial.println(rssi);
 }
 void startScanning() {
   Bluefruit.Scanner.setRxCallback(scan_callback);
