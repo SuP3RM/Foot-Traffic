@@ -1,2 +1,2 @@
 # Foot-Traffic
- Foot Traffic Project for Wireless Networking using a Nordic nRF5340 Development Kit
+ Foot Traffic Project for Wireless Networking using a Nordic nRF52840 Feather
