@@ -2,5 +2,6 @@
     "nrf-connect.applications": [
         "${workspaceFolder}/observer",
         "${workspaceFolder}/broadcaster"
-    ]
+    ],
+    "cmake.sourceDirectory": "/Users/marioaranda/Documents/GitHub/Foot-Traffic/broadcaster"
 }
